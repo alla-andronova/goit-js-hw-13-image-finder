@@ -25,40 +25,30 @@ refs.searchInput.addEventListener('input', debounce(onSearch, 1000));
 
 loadMoreBtn.refs.button.addEventListener('click', onBtnLoadMore);
 
-function executeSearch() {
+async function executeSearch() {
   if (pixabayService.searchQuery !== '') {
     loadMoreBtn.show();
     loadMoreBtn.disable();
 
-    pixabayService
-      .fetchImages()
-      .then(res => {
-        if (res.length === 0) {
-          throw res;
-        }
+    try {
+      const arrayOfImages = await pixabayService.fetchImages();
+      if (arrayOfImages.length === 0) {
+        throw error;
+      }
 
-        galleryMakup(res);
+      loadMoreBtn.enable();
 
-        loadMoreBtn.enable();
+      galleryMakup(arrayOfImages);
 
-        loadMoreBtn.refs.button.scrollIntoView({
-          behavior: 'smooth',
-          block: 'end',
-        });
-      })
-      .catch(error => {
-        showAlertNotFound();
-        loadMoreBtn.hide();
+      loadMoreBtn.refs.button.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
       });
+    } catch (error) {
+      showAlertNotFound();
+      loadMoreBtn.hide();
+    }
   }
-  // .then(() => {
-  //   loadMoreBtn.enable();
-
-  //   loadMoreBtn.refs.button.scrollIntoView({
-  //     behavior: 'smooth',
-  //     block: 'end',
-  //   });
-  // })
 }
 
 function onSearch(e) {

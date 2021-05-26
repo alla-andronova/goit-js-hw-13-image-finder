@@ -7,13 +7,14 @@ export default class PixabayService {
     this.pageNumber = 1;
   }
 
-  fetchImages() {
-    return fetch(
+  async fetchImages() {
+    const response = await fetch(
       `${BASE_URL}?image_type=photo&orientation=horizontal&q=${this.searchQuery}&page=${this.pageNumber}&per_page=12&key=${URL_KEY}`,
-    )
-      .then(respons => respons.json())
-      .then((this.pageNumber += 1))
-      .then(response => response.hits);
+    );
+
+    const images = await response.json();
+    this.pageNumber += 1;
+    return images.hits;
   }
 
   get query() {
