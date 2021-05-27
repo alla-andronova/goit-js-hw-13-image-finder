@@ -23,6 +23,7 @@ img {
   justify-content: center;
   padding: 8px;
   margin-bottom: 24px;
+  align-items: baseline;
 }
 
 .button {

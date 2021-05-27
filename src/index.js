@@ -1,7 +1,7 @@
 import './css/styles.css';
 import '../node_modules/basiclightbox/dist/basicLightbox.min.css';
 
-import debounce from 'lodash.debounce';
+// import debounce from 'lodash.debounce';
 
 import PixabayService from './js/apiService';
 import LoadMoreBtn from './js/components/load-more-btn';
@@ -13,6 +13,7 @@ import imgCardsTpl from './templates/imgCard.hbs';
 const refs = {
   searchInput: document.querySelector('.search-form'),
   galleryList: document.querySelector('.gallery'),
+  btnSearch: document.querySelector('.btn'),
 };
 
 const loadMoreBtn = new LoadMoreBtn({
@@ -21,7 +22,8 @@ const loadMoreBtn = new LoadMoreBtn({
 });
 const pixabayService = new PixabayService();
 
-refs.searchInput.addEventListener('input', debounce(onSearch, 1000));
+// refs.searchInput.addEventListener('input', debounce(onSearch, 1000));
+refs.searchInput.addEventListener('submit', onSearch);
 
 loadMoreBtn.refs.button.addEventListener('click', onBtnLoadMore);
 
@@ -32,8 +34,9 @@ async function executeSearch() {
 
     try {
       const arrayOfImages = await pixabayService.fetchImages();
+
       if (arrayOfImages.length === 0) {
-        throw error;
+        throw arrayOfImages;
       }
 
       loadMoreBtn.enable();
@@ -44,7 +47,7 @@ async function executeSearch() {
         behavior: 'smooth',
         block: 'end',
       });
-    } catch (error) {
+    } catch {
       showAlertNotFound();
       loadMoreBtn.hide();
     }
@@ -52,14 +55,15 @@ async function executeSearch() {
 }
 
 function onSearch(e) {
-  if (e.target.value === '') {
+  e.preventDefault();
+  if (e.currentTarget.elements.query.value === '') {
     loadMoreBtn.hide();
   }
 
   refs.galleryList.innerHTML = '';
   pixabayService.resetPage();
 
-  pixabayService.query = e.target.value;
+  pixabayService.query = e.currentTarget.elements.query.value;
 
   executeSearch();
 }
